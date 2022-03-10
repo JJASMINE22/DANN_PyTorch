@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 '''
-@Project ：DANN
-@File    ：dann_net.py
+@Project ：DANN_PyTorch
+@File    ：net.py
 @IDE     ：PyCharm 
 @Author  ：XinYi Huang
 '''

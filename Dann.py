@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 '''
-@Project ：CNN_LSTM
-@File    ：train.py
+@Project ：DANN_PyTorch
+@File    ：Dann.py
 @IDE     ：PyCharm 
 @Author  ：XinYi Huang
 '''

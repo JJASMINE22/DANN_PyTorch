@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 '''
-@Project ：DANN_pytorch
+@Project ：DANN_PyTorch
 @File    ：config.py
 @IDE     ：PyCharm 
 @Author  ：XinYi Huang
