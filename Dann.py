@@ -105,23 +105,9 @@ class DANN:
                              /(labels.size()[0]*2)
         self.calculate_f1_score(real_domains, fake_domains)
 
-        # label_predictor
-        self.lp_optimizer.zero_grad()
-
-        features = self.feature_extractor(real_sources).detach()
-        predictions = self.label_predictor(features)
-        lp_loss = self.lp_loss(predictions, labels)
-        for param in self.label_predictor.weights:
-            lp_loss += self.lp_decay*torch.sum(torch.square(param))
-        lp_loss.backward()
-
-        self.train_lp_loss += lp_loss.data.item()
-        self.train_lp_acc += torch.sum((torch.eq(predictions.argmax(dim=-1),
-                                                 labels.argmax(dim=-1)))).data.item()\
-                             /labels.size()[0]
-
-        # feature_extractor
+        # feature_extractor & label predictor
         self.fe_optimizer.zero_grad()
+        self.lp_optimizer.zero_grad()
 
         real_features = self.feature_extractor(real_sources)
         fake_features = self.feature_extractor(fake_sources)
@@ -136,9 +122,16 @@ class DANN:
         extract_loss = lp_loss - dc_loss
         for param in self.feature_extractor.weights:
             extract_loss += self.fe_decay*torch.sum(torch.square(param))
+        self.train_fe_loss += extract_loss.data.item()
+
+        for param in self.label_predictor.weights:
+            extract_loss += self.lp_decay*torch.sum(torch.square(param))
+            lp_loss += self.lp_decay*torch.sum(torch.square(param))
+        self.train_lp_loss += lp_loss.data.item()
+        self.train_lp_acc += torch.sum((torch.eq(predictions.argmax(dim=-1),
+                                                 labels.argmax(dim=-1)))).data.item()/labels.size()[0]
 
         extract_loss.backward()
-        self.train_fe_loss += extract_loss.data.item()
 
         self.lp_optimizer.step()
         self.fe_optimizer.step()
@@ -200,3 +193,4 @@ class DANN:
         real_dc_f1 = 2*real_dc_precision*real_dc_recall/(real_dc_precision+real_dc_recall+self.epsilon)
         fake_dc_f1 = 2*fake_dc_precision*fake_dc_recall/(fake_dc_precision+fake_dc_recall+self.epsilon)
         self.f1_score += ((real_dc_f1+fake_dc_f1)/2)**2
+
